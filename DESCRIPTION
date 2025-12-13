@@ -28,6 +28,8 @@ Imports:
     glue,
     htmlwidgets,
     modelsummary,
+    performance,
+    see,
     stats,
     shinyjs
 Suggests:
