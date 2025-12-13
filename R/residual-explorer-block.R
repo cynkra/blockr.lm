@@ -212,7 +212,7 @@ create_residual_plot_echarts <- function(model, x_var = "fitted", y_var = "resid
       trigger = "item",
       formatter = htmlwidgets::JS("function(params) { return params.name; }")
     ) |>
-    echarts4r::e_x_axis(name = x_label, nameLocation = "center", nameGap = 25) |>
+    echarts4r::e_x_axis(name = x_label, nameLocation = "center", nameGap = 25, scale = TRUE) |>
     echarts4r::e_y_axis(name = y_label, nameLocation = "middle", nameGap = 35, nameRotate = 90) |>
     echarts4r::e_color("#3498db") |>
     echarts4r::e_grid(left = "55px", right = "16px", bottom = "50px", top = "20px")
