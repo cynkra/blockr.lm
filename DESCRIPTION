@@ -24,6 +24,7 @@ Imports:
     broom,
     echarts4r,
     gglm,
+    ggplot2,
     glue,
     htmlwidgets,
     modelsummary,

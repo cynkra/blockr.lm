@@ -86,5 +86,5 @@ new_diagnostic_plot_block <- function(...) {
 #' @return A ggplot2/patchwork object with 4 diagnostic plots
 #' @keywords internal
 create_diagnostic_plots <- function(model) {
-  gglm::gglm(model)
+  gglm::gglm(model) & ggplot2::theme_minimal()
 }
