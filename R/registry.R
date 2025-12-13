@@ -2,6 +2,7 @@
 register_lm_blocks <- function() {
   blockr.core::register_blocks(
     c(
+      "new_model_block",
       "new_lm_block",
       "new_coef_block",
       "new_anova_block",
@@ -11,6 +12,7 @@ register_lm_blocks <- function() {
       "new_residual_explorer_block"
     ),
     name = c(
+      "Model",
       "Linear Model",
       "Coefficients Table",
       "ANOVA Table",
@@ -20,6 +22,7 @@ register_lm_blocks <- function() {
       "Residual Explorer"
     ),
     description = c(
+      "Fit statistical models (lm, logistic, poisson, gamma). Select model type, response and predictor variables.",
       "Fit a linear model using lm(). Select response and predictor variables.",
       "Extract model coefficients with standard errors, t-statistics, and p-values using broom::tidy().",
       "ANOVA table showing the decomposition of variance for model terms.",
@@ -33,11 +36,13 @@ register_lm_blocks <- function() {
       "transform",
       "transform",
       "transform",
+      "transform",
       "plot",
       "plot",
       "plot"
     ),
     icon = c(
+      "calculator",
       "graph-up",
       "table",
       "bar-chart",

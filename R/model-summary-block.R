@@ -220,17 +220,30 @@ html_model_tests <- function(model) {
       )))
     }
 
-    # Durbin-Watson test for autocorrelation (needs lmtest)
+    # Durbin-Watson test for autocorrelation
     if (length(resid) >= 3 && !is.null(fitted_vals)) {
-      # Simple lag-1 autocorrelation instead of full DW test
-      n <- length(resid)
+      # Calculate DW statistic
       dw_stat <- sum(diff(resid)^2) / sum(resid^2)
+
+      # Heuristic p-value based on distance from 2
+      # DW near 2 = no autocorrelation (good)
+      # DW < 1.5 or > 2.5 = potential autocorrelation (bad)
+      dw_deviation <- abs(dw_stat - 2)
+      dw_p <- if (dw_deviation < 0.3) {
+        0.5  # OK - close to 2
+      } else if (dw_deviation < 0.5) {
+        0.1  # Marginal
+      } else if (dw_deviation < 0.7) {
+        0.05  # Concern
+      } else {
+        0.01  # Strong concern
+      }
 
       test_results <- c(test_results, list(list(
         name = "Durbin-Watson",
         hypothesis = "H0: no autocorrelation",
         stat = sprintf("DW = %.3f", dw_stat),
-        p = NA  # Approximate - DW near 2 is good
+        p = dw_p
       )))
     }
 

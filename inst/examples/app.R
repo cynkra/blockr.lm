@@ -5,14 +5,16 @@
 library(blockr)
 pkgload::load_all()
 
-# Run the demo app showing linear modeling workflow
+# Run the demo app showing modeling workflow
 run_app(
   blocks = c(
     # Data source - using mtcars
     data = new_dataset_block("mtcars"),
 
-    # Fit linear model: mpg ~ cyl + hp + wt
-    model = new_lm_block(
+    # Fit model: mpg ~ cyl + hp + wt
+    # Use new_model_block() which supports lm, logistic, poisson, gamma
+    model = new_model_block(
+      model_type = "lm",
       response = "mpg",
       predictors = c("cyl", "hp", "wt")
     ),
@@ -36,5 +38,5 @@ run_app(
     new_link("model", "plots", "data"),
     new_link("model", "resid", "data")
   ),
-  title = "Linear Model Demo"
+  title = "Model Demo"
 )
