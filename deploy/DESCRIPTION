@@ -1,0 +1,20 @@
+Type: Shiny
+Title: blockr.lm Linear Modeling Demo
+Imports:
+    shiny,
+    jsonlite,
+    blockr.core,
+    blockr,
+    blockr.lm,
+    blockr.dock,
+    blockr.dag,
+    broom,
+    modelsummary,
+    echarts4r,
+    htmlwidgets
+Remotes:
+    BristolMyersSquibb/blockr.core,
+    BristolMyersSquibb/blockr,
+    BristolMyersSquibb/blockr.dock,
+    BristolMyersSquibb/blockr.dag,
+    christophsax/blockr.lm

@@ -80,22 +80,11 @@ new_diagnostic_plot_block <- function(...) {
 
 #' Create diagnostic plots for lm object
 #'
-#' Internal helper function that creates the 4-panel diagnostic plot.
+#' Internal helper function that creates the 4-panel diagnostic plot using gglm.
 #'
 #' @param model An lm model object
-#' @return NULL (plots are created as side effect)
+#' @return A ggplot2/patchwork object with 4 diagnostic plots
 #' @keywords internal
 create_diagnostic_plots <- function(model) {
-  # Set up 2x2 plot layout
-  old_par <- par(mfrow = c(2, 2), mar = c(4, 4, 2, 1))
-  on.exit(par(old_par))
-
-  # Create the 4 diagnostic plots
-  # which: 1 = Residuals vs Fitted
-  #        2 = Normal Q-Q
-  #        3 = Scale-Location
-  #        5 = Residuals vs Leverage (skip 4 = Cook's distance)
-  plot(model, which = c(1, 2, 3, 5), add.smooth = TRUE)
-
-  invisible(NULL)
+  gglm::gglm(model)
 }
