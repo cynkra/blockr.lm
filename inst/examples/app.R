@@ -3,6 +3,7 @@
 # Run with: source("inst/examples/app.R")
 
 library(blockr)
+pkgload::load_all()
 
 # Run the demo app showing linear modeling workflow
 run_app(
@@ -19,6 +20,9 @@ run_app(
     # Coefficients table
     coef = new_coef_block(conf_int = TRUE, conf_level = 0.95),
 
+    # Coefficient plot
+    coefplot = new_coefplot_block(),
+
     # ANOVA table
     anova = new_anova_block(),
 
@@ -31,6 +35,7 @@ run_app(
   links = c(
     new_link("data", "model", "data"),
     new_link("model", "coef", "data"),
+    new_link("model", "coefplot", "data"),
     new_link("model", "anova", "data"),
     new_link("model", "plots", "data"),
     new_link("model", "resid", "data")

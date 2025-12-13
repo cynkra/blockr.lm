@@ -23,6 +23,7 @@ Imports:
     blockr.core (>= 0.1.1),
     broom,
     glue,
+    modelsummary,
     plotly,
     stats,
     shinyjs
