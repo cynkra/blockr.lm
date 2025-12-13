@@ -14,7 +14,6 @@ NULL
 
 #' @export
 blockr_ser.character <- function(x, ...) {
-
   x
 }
 
@@ -30,5 +29,25 @@ blockr_ser.numeric <- function(x, ...) {
 
 #' @export
 blockr_ser.integer <- function(x, ...) {
+  x
+}
+
+#' @export
+blockr_deser.character <- function(x, ...) {
+  x
+}
+
+#' @export
+blockr_deser.logical <- function(x, ...) {
+  x
+}
+
+#' @export
+blockr_deser.numeric <- function(x, ...) {
+  x
+}
+
+#' @export
+blockr_deser.integer <- function(x, ...) {
   x
 }
