@@ -17,14 +17,11 @@ run_app(
       predictors = c("cyl", "hp", "wt")
     ),
 
-    # Coefficients table
-    coef = new_coef_block(conf_int = TRUE, conf_level = 0.95),
+    # Model summary (HTML display with coefficients, stats, diagnostics)
+    summary = new_model_summary_block(),
 
     # Coefficient plot
     coefplot = new_coefplot_block(),
-
-    # ANOVA table
-    anova = new_anova_block(),
 
     # Diagnostic plots
     plots = new_diagnostic_plot_block(),
@@ -34,9 +31,8 @@ run_app(
   ),
   links = c(
     new_link("data", "model", "data"),
-    new_link("model", "coef", "data"),
+    new_link("model", "summary", "data"),
     new_link("model", "coefplot", "data"),
-    new_link("model", "anova", "data"),
     new_link("model", "plots", "data"),
     new_link("model", "resid", "data")
   ),
