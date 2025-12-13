@@ -1,16 +1,15 @@
 #' Residual Explorer Block
 #'
-#' Interactive residual exploration using plotly. Allows users to explore
-#' the relationship between fitted values and residuals, with the ability
-#' to color points by a variable from the original data and identify
-#' observations by clicking.
+#' Interactive residual exploration using echarts4r. Allows users to explore
+#' the relationship between fitted values and residuals, with hover tooltips
+#' to identify observations.
 #'
 #' @param x_var What to plot on x-axis: "fitted" (fitted values) or "index" (observation number)
 #' @param y_var What to plot on y-axis: "residuals", "standardized", or "studentized"
 #' @param ... Forwarded to [new_block()]
 #'
 #' @return A block object of class `residual_explorer_block` that outputs an
-#'   interactive plotly plot.
+#'   interactive echarts4r plot.
 #'
 #' @examples
 #' if (interactive()) {
@@ -49,7 +48,7 @@ new_residual_explorer_block <- function(
               y <- r_y_var()
 
               expr_text <- glue::glue(
-                "blockr.lm:::create_residual_plot(data, x_var = '{x}', y_var = '{y}')"
+                "blockr.lm:::create_residual_plot_echarts(data, x_var = '{x}', y_var = '{y}')"
               )
               parse(text = expr_text)[[1]]
             }),
@@ -83,8 +82,7 @@ new_residual_explorer_block <- function(
                 # Help text
                 div(
                   class = "block-help-text",
-                  "Interactive residual plot. Hover over points to see details. ",
-                  "Use the toolbar to zoom, pan, or save the plot."
+                  "Hover over points to see observation details."
                 ),
 
                 # X-axis variable
@@ -124,31 +122,31 @@ new_residual_explorer_block <- function(
       )
     },
     dat_valid = function(data) {
-      stopifnot(inherits(data, "lm"))
+      stopifnot(inherits(data, "lm") || inherits(data, "glm"))
     },
     class = "residual_explorer_block",
     ...
   )
 }
 
-#' Create interactive residual plot
+#' Create interactive residual plot with echarts4r
 #'
-#' Internal helper function that creates the plotly residual plot.
+#' Internal helper function that creates the echarts4r residual plot.
 #'
-#' @param model An lm model object
+#' @param model An lm or glm model object
 #' @param x_var What to plot on x-axis: "fitted" or "index"
 #' @param y_var What to plot on y-axis: "residuals", "standardized", or "studentized"
-#' @return A plotly object
+#' @return An echarts4r object
 #' @keywords internal
-create_residual_plot <- function(model, x_var = "fitted", y_var = "residuals") {
+create_residual_plot_echarts <- function(model, x_var = "fitted", y_var = "residuals") {
   # Extract data from model
-  fitted_vals <- fitted(model)
-  resid_vals <- residuals(model)
+  fitted_vals <- stats::fitted(model)
+  resid_vals <- stats::residuals(model)
 
   # Get observation names/indices
   obs_names <- names(fitted_vals)
   if (is.null(obs_names)) {
-    obs_names <- seq_along(fitted_vals)
+    obs_names <- as.character(seq_along(fitted_vals))
   }
 
   # Calculate x values
@@ -164,8 +162,14 @@ create_residual_plot <- function(model, x_var = "fitted", y_var = "residuals") {
   y_vals <- switch(
     y_var,
     "residuals" = resid_vals,
-    "standardized" = rstandard(model),
-    "studentized" = rstudent(model),
+    "standardized" = tryCatch(
+      stats::rstandard(model),
+      error = function(e) resid_vals / stats::sd(resid_vals)
+    ),
+    "studentized" = tryCatch(
+      stats::rstudent(model),
+      error = function(e) resid_vals / stats::sd(resid_vals)
+    ),
     resid_vals
   )
 
@@ -177,72 +181,48 @@ create_residual_plot <- function(model, x_var = "fitted", y_var = "residuals") {
     "Residuals"
   )
 
-  # Create data frame for plotting
+  # Create data frame for plotting with tooltip column
   plot_data <- data.frame(
     x = x_vals,
     y = y_vals,
-    obs = obs_names,
-    fitted = fitted_vals,
-    residual = resid_vals,
+    tooltip = paste0(
+      "<strong>", obs_names, "</strong><br/>",
+      "Fitted: ", round(fitted_vals, 3), "<br/>",
+      "Residual: ", round(resid_vals, 3)
+    ),
     stringsAsFactors = FALSE
   )
 
-  # Create plotly scatter plot
-  p <- plotly::plot_ly(
-    data = plot_data,
-    x = ~x,
-    y = ~y,
-    type = "scatter",
-    mode = "markers",
-    text = ~paste0(
-      "Obs: ", obs, "<br>",
-      "Fitted: ", round(fitted, 3), "<br>",
-      "Residual: ", round(residual, 3)
-    ),
-    hoverinfo = "text",
-    marker = list(
-      size = 8,
-      color = "#3498db",
-      opacity = 0.7
-    )
-  )
-
-  # Add horizontal line at y = 0
-  p <- plotly::layout(
-    p,
-    xaxis = list(title = x_label),
-    yaxis = list(title = y_label),
-    shapes = list(
-      list(
-        type = "line",
-        x0 = min(x_vals),
-        x1 = max(x_vals),
-        y0 = 0,
-        y1 = 0,
-        line = list(color = "#e74c3c", dash = "dash", width = 1)
-      )
-    ),
-    hovermode = "closest"
-  )
-
-  # Configure toolbar
-  p <- plotly::config(
-    p,
-    displayModeBar = TRUE,
-    modeBarButtonsToRemove = c(
-      "select2d", "lasso2d", "autoScale2d",
-      "hoverClosestCartesian", "hoverCompareCartesian"
-    )
-  )
-
-  p
+  # Build echarts4r plot
+  plot_data |>
+    echarts4r::e_charts(x) |>
+    echarts4r::e_scatter(
+      y,
+      symbol_size = 10,
+      bind = tooltip,
+      legend = FALSE
+    ) |>
+    echarts4r::e_mark_line(
+      data = list(yAxis = 0),
+      lineStyle = list(type = "dashed", color = "#e74c3c", width = 1),
+      symbol = "none",
+      silent = TRUE
+    ) |>
+    echarts4r::e_tooltip(
+      trigger = "item",
+      formatter = htmlwidgets::JS("function(params) { return params.name; }")
+    ) |>
+    echarts4r::e_x_axis(name = x_label, nameLocation = "center", nameGap = 25) |>
+    echarts4r::e_y_axis(name = y_label, nameLocation = "middle", nameGap = 35, nameRotate = 90) |>
+    echarts4r::e_color("#3498db") |>
+    echarts4r::e_grid(left = "55px", right = "16px", bottom = "50px", top = "20px")
 }
 
 #' Custom block output for residual_explorer_block
 #'
 #' @export
 block_output.residual_explorer_block <- function(x, result, session) {
-  plotly::renderPlotly(result)
+  echarts4r::renderEcharts4r(result)
 }
 
 #' Custom block UI for residual_explorer_block
@@ -250,6 +230,6 @@ block_output.residual_explorer_block <- function(x, result, session) {
 #' @export
 block_ui.residual_explorer_block <- function(id, x, ...) {
   tagList(
-    plotly::plotlyOutput(NS(id, "result"), height = "400px")
+    echarts4r::echarts4rOutput(NS(id, "result"), height = "400px")
   )
 }

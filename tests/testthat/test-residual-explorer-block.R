@@ -118,40 +118,41 @@ test_that("residual explorer block UI generation", {
   expect_true(grepl("Residual", ui_text, ignore.case = TRUE))
 })
 
-test_that("create_residual_plot helper function works", {
-  skip_if_not_installed("plotly")
+test_that("create_residual_plot_echarts helper function works", {
+  skip_if_not_installed("echarts4r")
 
   model <- lm(mpg ~ cyl + hp, data = mtcars)
 
+  # Access internal function
+  create_plot <- blockr.lm:::create_residual_plot_echarts
+
   # Test with default parameters
-  plot <- create_residual_plot(model, x_var = "fitted", y_var = "residuals")
-  expect_s3_class(plot, "plotly")
+  plot <- create_plot(model, x_var = "fitted", y_var = "residuals")
+  expect_s3_class(plot, "echarts4r")
 
   # Test with index on x-axis
-  plot <- create_residual_plot(model, x_var = "index", y_var = "residuals")
-  expect_s3_class(plot, "plotly")
+  plot <- create_plot(model, x_var = "index", y_var = "residuals")
+  expect_s3_class(plot, "echarts4r")
 
   # Test with standardized residuals
-  plot <- create_residual_plot(model, x_var = "fitted", y_var = "standardized")
-  expect_s3_class(plot, "plotly")
+  plot <- create_plot(model, x_var = "fitted", y_var = "standardized")
+  expect_s3_class(plot, "echarts4r")
 
   # Test with studentized residuals
-  plot <- create_residual_plot(model, x_var = "fitted", y_var = "studentized")
-  expect_s3_class(plot, "plotly")
+  plot <- create_plot(model, x_var = "fitted", y_var = "studentized")
+  expect_s3_class(plot, "echarts4r")
 })
 
-test_that("create_residual_plot returns correct data structure", {
-  skip_if_not_installed("plotly")
+test_that("create_residual_plot_echarts works with glm models", {
+  skip_if_not_installed("echarts4r")
 
-  model <- lm(mpg ~ cyl, data = mtcars)
-  plot <- create_residual_plot(model)
+  # Logistic regression
+  model <- glm(am ~ mpg + hp, data = mtcars, family = binomial())
 
-  # Should be a plotly object
-  expect_s3_class(plot, "plotly")
+  create_plot <- blockr.lm:::create_residual_plot_echarts
 
-  # Should have x and y data
-  plot_data <- plotly::plotly_data(plot)
-  expect_true(nrow(plot_data) == nrow(mtcars))
-  expect_true("x" %in% names(plot_data))
-  expect_true("y" %in% names(plot_data))
+  # Should work with glm
+
+  plot <- create_plot(model, x_var = "fitted", y_var = "residuals")
+  expect_s3_class(plot, "echarts4r")
 })

@@ -6,7 +6,7 @@
 \alias{blockr.lm-package}
 \title{blockr.lm: Linear Model Blocks for blockr}
 \description{
-Extends 'blockr.core' with interactive blocks for linear model fitting and diagnostics. Users can build and explore linear models through a graphical interface, including coefficient tables, ANOVA tables, diagnostic plots, and interactive residual exploration using plotly.
+Extends 'blockr.core' with interactive blocks for statistical model fitting and diagnostics. Users can build and explore linear and generalized linear models through a graphical interface, including coefficient tables, ANOVA tables, diagnostic plots, and interactive residual exploration.
 }
 \seealso{
 Useful links:

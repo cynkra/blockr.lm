@@ -15,13 +15,12 @@ new_residual_explorer_block(x_var = "fitted", y_var = "residuals", ...)
 }
 \value{
 A block object of class \code{residual_explorer_block} that outputs an
-interactive plotly plot.
+interactive echarts4r plot.
 }
 \description{
-Interactive residual exploration using plotly. Allows users to explore
-the relationship between fitted values and residuals, with the ability
-to color points by a variable from the original data and identify
-observations by clicking.
+Interactive residual exploration using echarts4r. Allows users to explore
+the relationship between fitted values and residuals, with hover tooltips
+to identify observations.
 }
 \examples{
 if (interactive()) {
