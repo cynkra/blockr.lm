@@ -2,12 +2,17 @@
 #
 # This example demonstrates how to extend blockr.lm's specialized modeling blocks
 # with blockr.extra's new_function_block() for custom outputs like gtsummary tables.
+# It also demonstrates async execution with new_async_function_block().
 #
 # Run with: source("inst/examples/hybrid-lm.R")
 
 library(blockr)
 pkgload::load_all()
 pkgload::load_all("../blockr.extra")
+
+# Setup mirai daemons for async execution
+mirai::daemons(2)
+shiny::onStop(function() mirai::daemons(0))
 
 run_app(
   blocks = c(
@@ -41,20 +46,34 @@ run_app(
       }"
     ),
 
-    # Custom model: Robust regression using MASS::rlm
+    # Custom model: Robust regression using MASS::rlm (ASYNC)
     # (not natively supported by blockr.lm)
     # - formula: text input for model specification
     # - psi: dropdown for robust estimation method
-    robust_model = new_function_block(
+    # Uses async execution - click "Run" to execute, "Cancel" to stop
+    # Note: Async blocks require user to click "Run" before result is available.
+    # The result is displayed directly in the block's output area.
+    robust_model = new_async_function_block(
       fn = "function(data,
                      formula = 'mpg ~ cyl + hp + wt',
                      psi = c('psi.huber', 'psi.hampel', 'psi.bisquare')) {
+        Sys.sleep(2)  # Simulate slow computation
         MASS::rlm(as.formula(formula), data = data, psi = psi)
       }"
     ),
 
-    # Coefficient plot for robust model (works with rlm objects)
-    robust_coefplot = new_coefplot_block(),
+    # Example of async block returning a ggplot
+    async_plot = new_async_function_block(
+      fn = "function(data,
+                     x = c('wt', 'hp', 'disp', 'cyl'),
+                     y = c('mpg', 'qsec', 'drat')) {
+        Sys.sleep(1)
+        ggplot2::ggplot(data, ggplot2::aes(x = .data[[x]], y = .data[[y]])) +
+          ggplot2::geom_point() +
+          ggplot2::geom_smooth(method = 'lm') +
+          ggplot2::theme_minimal()
+      }"
+    ),
 
     # === 3D visualization branch ===
 
@@ -76,9 +95,9 @@ run_app(
     new_link("model", "resid", "data"),
     new_link("model", "summary_tbl", "data"),
 
-    # Robust model branch (custom model via function block)
+    # Async blocks (standalone - output displayed directly in block)
     new_link("data", "robust_model", "data"),
-    new_link("robust_model", "robust_coefplot", "data"),
+    new_link("data", "async_plot", "data"),
 
     # 3D visualization branch
     new_link("data", "model_2pred", "data"),
