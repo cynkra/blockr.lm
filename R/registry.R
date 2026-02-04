@@ -10,7 +10,8 @@ register_lm_blocks <- function() {
       "new_coefplot_block",
       "new_diagnostic_plot_block",
       "new_residual_explorer_block",
-      "new_check_model_block"
+      "new_check_model_block",
+      "new_regression_3d_block"
     ),
     name = c(
       "Model",
@@ -21,7 +22,8 @@ register_lm_blocks <- function() {
       "Coefficient Plot",
       "Diagnostic Plots",
       "Residual Explorer",
-      "Check Model"
+      "Check Model",
+      "3D Regression Plot"
     ),
     description = c(
       "Fit statistical models (lm, logistic, poisson, gamma). Select model type, response and predictor variables.",
@@ -32,7 +34,8 @@ register_lm_blocks <- function() {
       "Dot-and-whisker plot of coefficients with confidence intervals.",
       "Standard diagnostic plots: Residuals vs Fitted, Q-Q, Scale-Location, and Leverage.",
       "Interactive residual exploration with plotly. Click to identify observations.",
-      "Comprehensive model diagnostics using performance package: VIF, normality, homoscedasticity, outliers."
+      "Comprehensive model diagnostics using performance package: VIF, normality, homoscedasticity, outliers.",
+      "Interactive 3D scatter plot with regression plane for models with 2 predictors."
     ),
     category = c(
       "transform",
@@ -40,6 +43,7 @@ register_lm_blocks <- function() {
       "transform",
       "transform",
       "transform",
+      "plot",
       "plot",
       "plot",
       "plot",
@@ -54,7 +58,8 @@ register_lm_blocks <- function() {
       "bullseye",
       "grid-3x3",
       "search",
-      "check2-square"
+      "check2-square",
+      "box"
     ),
     package = utils::packageName(),
     overwrite = TRUE

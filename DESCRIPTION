@@ -28,6 +28,7 @@ Imports:
     htmlwidgets,
     modelsummary,
     performance,
+    plotly,
     see,
     stats,
     shinyjs
