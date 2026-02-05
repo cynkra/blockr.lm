@@ -37,6 +37,9 @@ run_app(
     # Interactive residual explorer
     resid = new_residual_explorer_block(),
 
+    # Broom summary for lm model (should show p-value badges)
+    model_broom = new_broom_summary_block(),
+
     # === blockr.extra function blocks for custom functionality ===
 
     # Use gtsummary for publication-ready regression table
@@ -61,6 +64,10 @@ run_app(
         MASS::rlm(as.formula(formula), data = data, psi = psi)
       }"
     ),
+
+    # Broom summary for the robust model (from blockr.extra)
+    # Shows adaptive HTML summary using broom::tidy/glance/augment
+    robust_summary = new_broom_summary_block(),
 
     # Example of async block returning a ggplot
     async_plot = new_async_function_block(
@@ -94,9 +101,11 @@ run_app(
     new_link("model", "coefplot", "data"),
     new_link("model", "resid", "data"),
     new_link("model", "summary_tbl", "data"),
+    new_link("model", "model_broom", "data"),
 
     # Async blocks (standalone - output displayed directly in block)
     new_link("data", "robust_model", "data"),
+    new_link("robust_model", "robust_summary", "data"),
     new_link("data", "async_plot", "data"),
 
     # 3D visualization branch
