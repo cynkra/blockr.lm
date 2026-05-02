@@ -1,3 +1,37 @@
+test_that("lm block produces a fitted lm via block_server", {
+  block <- new_lm_block(response = "yA", predictors = c("xA1", "xA2"))
+  shiny::testServer(
+    blockr.core:::get_s3_method("block_server", block),
+    {
+      session$flushReact()
+      result <- session$returned$result()
+      expect_s3_class(result, "lm")
+      expect_named(coef(result), c("(Intercept)", "xA1", "xA2"))
+    },
+    args = list(x = block, data = list(data = function() .tdf_a()))
+  )
+})
+
+test_that("lm block clears stale column state on data swap", {
+  data_rv <- shiny::reactiveVal(.tdf_a())
+  block <- new_lm_block(response = "yA", predictors = c("xA1", "xA2"))
+  shiny::testServer(
+    blockr.core:::get_s3_method("block_server", block),
+    {
+      session$flushReact()
+      expect_s3_class(session$returned$result(), "lm")
+
+      data_rv(.tdf_b())
+      session$flushReact()
+      st <- session$returned$state
+      cb <- colnames(.tdf_b())
+      expect_true(length(st$response()) == 0L || all(st$response() %in% cb))
+      expect_true(length(st$predictors()) == 0L || all(st$predictors() %in% cb))
+    },
+    args = list(x = block, data = list(data = function() data_rv()))
+  )
+})
+
 test_that("lm block expression generation - basic model", {
   skip_if_not_installed("shiny")
   skip_if_not_installed("blockr.core")

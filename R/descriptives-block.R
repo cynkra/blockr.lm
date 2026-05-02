@@ -37,8 +37,10 @@ new_descriptives_block <- function(
             req(data())
             d <- data()
             num_cols <- colnames(d)[vapply(d, is.numeric, logical(1))]
+            new_vars <- intersect(r_vars(), num_cols)
+            r_vars(new_vars)
             updateSelectizeInput(session, "vars",
-              choices = num_cols, selected = r_vars())
+              choices = num_cols, selected = new_vars)
           }
         }, ignoreNULL = FALSE)
 

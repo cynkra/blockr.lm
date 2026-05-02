@@ -54,3 +54,16 @@ test_that("create_diagnostic_plots with simple model", {
   # Should produce plots without error
   expect_no_error(create_diagnostic_plots(model))
 })
+
+test_that("diagnostic_plot block produces output via block_server", {
+  m <- lm(yA ~ xA1 + xA2, data = .tdf_a())
+  block <- new_diagnostic_plot_block()
+  shiny::testServer(
+    blockr.core:::get_s3_method("block_server", block),
+    {
+      session$flushReact()
+      expect_false(is.null(session$returned$result()))
+    },
+    args = list(x = block, data = list(data = function() m))
+  )
+})

@@ -65,6 +65,24 @@ new_nonparametric_block <- function(
           }
         })
 
+        observeEvent(colnames(data()), {
+          if (r_initialized()) {
+            req(data())
+            d <- data()
+            num <- colnames(d)[vapply(d, is.numeric, logical(1))]
+            cat <- colnames(d)[vapply(
+              d, function(x) is.factor(x) || is.character(x), logical(1)
+            )]
+            new_dv <- intersect(r_dv(), num)
+            new_pair <- intersect(r_pair(), num)
+            new_group <- intersect(r_group(), cat)
+            r_dv(new_dv); r_pair(new_pair); r_group(new_group)
+            updateSelectizeInput(session, "dv", choices = num, selected = new_dv)
+            updateSelectizeInput(session, "pair", choices = num, selected = new_pair)
+            updateSelectizeInput(session, "group", choices = cat, selected = new_group)
+          }
+        }, ignoreNULL = FALSE)
+
         list(
           expr = reactive({
             tt <- r_test_type()

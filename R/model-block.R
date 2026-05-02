@@ -104,21 +104,40 @@ new_model_block <- function(
             }
           })
 
-          # Update column choices when data changes, preserve selection
+          # When data columns change, drop any selections that no longer
+          # exist in the new schema, then refresh the picker UI. Updating
+          # the reactive *state* (not just the widget) is what stops
+          # stale column names from leaking into the formula.
           observeEvent(
             colnames(data()),
             {
               if (r_initialized()) {
                 req(data())
                 d <- data()
+                num <- numeric_cols(d)
+                cat <- categorical_cols(d)
+                all <- all_cols(d)
+
+                new_resp <- intersect(r_response(), all)
+                new_preds <- intersect(r_predictors(), num)
+                new_facs <- intersect(r_factors(), cat)
+                new_re <- intersect(r_random_effects(), cat)
+
+                # Update state first; the input observers will not fire
+                # for "no change" or NULL emissions from the widget.
+                r_response(new_resp)
+                r_predictors(new_preds)
+                r_factors(new_facs)
+                r_random_effects(new_re)
+
                 updateSelectizeInput(session, "response",
-                  choices = all_cols(d), selected = r_response())
+                  choices = all, selected = new_resp)
                 updateSelectizeInput(session, "predictors",
-                  choices = numeric_cols(d), selected = r_predictors())
+                  choices = num, selected = new_preds)
                 updateSelectizeInput(session, "factors",
-                  choices = categorical_cols(d), selected = r_factors())
+                  choices = cat, selected = new_facs)
                 updateSelectizeInput(session, "random_effects",
-                  choices = categorical_cols(d), selected = r_random_effects())
+                  choices = cat, selected = new_re)
               }
             },
             ignoreNULL = FALSE

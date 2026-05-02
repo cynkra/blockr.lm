@@ -156,3 +156,16 @@ test_that("create_residual_plot_echarts works with glm models", {
   plot <- create_plot(model, x_var = "fitted", y_var = "residuals")
   expect_s3_class(plot, "echarts4r")
 })
+
+test_that("residual_explorer block produces output via block_server", {
+  m <- lm(yA ~ xA1 + xA2, data = .tdf_a())
+  block <- new_residual_explorer_block()
+  shiny::testServer(
+    blockr.core:::get_s3_method("block_server", block),
+    {
+      session$flushReact()
+      expect_false(is.null(session$returned$result()))
+    },
+    args = list(x = block, data = list(data = function() m))
+  )
+})

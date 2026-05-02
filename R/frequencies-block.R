@@ -41,8 +41,10 @@ new_frequencies_block <- function(
             cat_cols <- colnames(d)[vapply(
               d, function(x) is.factor(x) || is.character(x), logical(1)
             )]
+            new_vars <- intersect(r_vars(), cat_cols)
+            r_vars(new_vars)
             updateSelectizeInput(session, "vars",
-              choices = cat_cols, selected = r_vars())
+              choices = cat_cols, selected = new_vars)
           }
         }, ignoreNULL = FALSE)
 

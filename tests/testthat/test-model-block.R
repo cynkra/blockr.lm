@@ -1,3 +1,70 @@
+test_that("model block produces a fitted lm via block_server", {
+  block <- new_model_block(
+    model_type = "lm",
+    response = "yA",
+    predictors = c("xA1", "xA2")
+  )
+  shiny::testServer(
+    blockr.core:::get_s3_method("block_server", block),
+    {
+      session$flushReact()
+      result <- session$returned$result()
+      expect_s3_class(result, "lm")
+      expect_named(coef(result), c("(Intercept)", "xA1", "xA2"))
+    },
+    args = list(x = block, data = list(data = function() .tdf_a()))
+  )
+})
+
+test_that("model block produces a fitted glmer for mixed logistic", {
+  d <- .tdf_a()
+  d$y_bin <- factor(ifelse(d$yA > 0, "yes", "no"))
+  block <- new_model_block(
+    model_type = "glmer",
+    response = "y_bin",
+    predictors = "xA1",
+    random_effects = "fA3"
+  )
+  shiny::testServer(
+    blockr.core:::get_s3_method("block_server", block),
+    {
+      session$flushReact()
+      result <- session$returned$result()
+      expect_s4_class(result, "glmerMod")
+    },
+    args = list(x = block, data = list(data = function() d))
+  )
+})
+
+test_that("model block clears stale column state on data swap", {
+  data_rv <- shiny::reactiveVal(.tdf_a())
+  block <- new_model_block(
+    model_type = "lm",
+    response = "yA",
+    predictors = c("xA1", "xA2"),
+    factors = "fA3"
+  )
+  shiny::testServer(
+    blockr.core:::get_s3_method("block_server", block),
+    {
+      session$flushReact()
+      expect_s3_class(session$returned$result(), "lm")
+
+      # Swap to a dataset with no overlapping column names. The old
+      # response / predictors / factors must be dropped from state so
+      # they cannot leak into the next formula.
+      data_rv(.tdf_b())
+      session$flushReact()
+      st <- session$returned$state
+      cb <- colnames(.tdf_b())
+      expect_true(length(st$response()) == 0L || all(st$response() %in% cb))
+      expect_true(length(st$predictors()) == 0L || all(st$predictors() %in% cb))
+      expect_true(length(st$factors()) == 0L || all(st$factors() %in% cb))
+    },
+    args = list(x = block, data = list(data = function() data_rv()))
+  )
+})
+
 test_that("model block creates lm with default type", {
   skip_if_not_installed("shiny")
   skip_if_not_installed("blockr.core")

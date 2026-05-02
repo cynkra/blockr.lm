@@ -80,17 +80,22 @@ new_lm_block <- function(
                 cols <- colnames(data())
                 numeric_cols <- cols[vapply(data(), is.numeric, logical(1))]
 
+                new_resp <- intersect(r_response(), numeric_cols)
+                new_preds <- intersect(r_predictors(), numeric_cols)
+                r_response(new_resp)
+                r_predictors(new_preds)
+
                 updateSelectizeInput(
                   session,
                   "response",
                   choices = numeric_cols,
-                  selected = r_response()
+                  selected = new_resp
                 )
                 updateSelectizeInput(
                   session,
                   "predictors",
                   choices = numeric_cols,
-                  selected = r_predictors()
+                  selected = new_preds
                 )
               }
             },

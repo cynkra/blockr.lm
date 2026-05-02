@@ -45,6 +45,24 @@ new_normality_check_block <- function(
           }
         })
 
+        observeEvent(colnames(data()), {
+          if (r_initialized()) {
+            req(data())
+            d <- data()
+            num <- colnames(d)[vapply(d, is.numeric, logical(1))]
+            cat <- colnames(d)[vapply(
+              d, function(x) is.factor(x) || is.character(x), logical(1)
+            )]
+            new_vars <- intersect(r_vars(), num)
+            new_group <- intersect(r_group(), cat)
+            r_vars(new_vars); r_group(new_group)
+            updateSelectizeInput(session, "vars",
+              choices = num, selected = new_vars)
+            updateSelectizeInput(session, "group",
+              choices = c("(none)" = "", cat), selected = new_group)
+          }
+        }, ignoreNULL = FALSE)
+
         list(
           expr = reactive({
             v <- r_vars()

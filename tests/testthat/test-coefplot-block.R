@@ -148,3 +148,16 @@ test_that("coefplot block produces valid plot", {
   plot <- modelsummary::modelplot(model, coef_omit = "(Intercept)")
   expect_s3_class(plot, "ggplot")
 })
+
+test_that("coefplot block produces a plot via block_server", {
+  m <- lm(yA ~ xA1 + xA2, data = .tdf_a())
+  block <- new_coefplot_block()
+  shiny::testServer(
+    blockr.core:::get_s3_method("block_server", block),
+    {
+      session$flushReact()
+      expect_false(is.null(session$returned$result()))
+    },
+    args = list(x = block, data = list(data = function() m))
+  )
+})

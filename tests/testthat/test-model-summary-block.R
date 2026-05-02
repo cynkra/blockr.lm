@@ -127,3 +127,21 @@ test_that("model summary works with glm", {
   result <- html_coefs(tidy_df)
   expect_s3_class(result, "shiny.tag")
 })
+
+test_that("model_summary block produces a glance tibble via block_server", {
+  m <- lm(yA ~ xA1 + xA2, data = .tdf_a())
+  block <- new_model_summary_block()
+  shiny::testServer(
+    blockr.core:::get_s3_method("block_server", block),
+    {
+      session$flushReact()
+      result <- session$returned$result()
+      expect_s3_class(result, "data.frame")
+      expect_true("r.squared" %in% names(result))
+      # the model + tidy are attached as attributes for the custom render
+      expect_false(is.null(attr(result, "model")))
+      expect_false(is.null(attr(result, "tidy")))
+    },
+    args = list(x = block, data = list(data = function() m))
+  )
+})
