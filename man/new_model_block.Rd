@@ -8,30 +8,41 @@ new_model_block(
   model_type = "lm",
   response = character(),
   predictors = character(),
+  factors = character(),
+  random_effects = character(),
   intercept = TRUE,
   ...
 )
 }
 \arguments{
-\item{model_type}{Model type: "lm" (linear), "logistic" (logistic regression),
-"poisson" (Poisson regression), "gamma" (Gamma regression)}
+\item{model_type}{Model type. One of: "lm" (linear), "logistic" (binomial GLM),
+"poisson" (Poisson GLM), "gamma" (Gamma GLM), "multinom" (multinomial via
+\code{nnet::multinom}), "polr" (ordinal via \code{MASS::polr}), "lmer" (mixed linear
+via \code{lme4::lmer}), "glmer" (mixed logistic via \code{lme4::glmer}).}
 
-\item{response}{Response variable column name (single column)}
+\item{response}{Response variable column name (single column).}
 
-\item{predictors}{Predictor variable column names (can be multiple)}
+\item{predictors}{Numeric predictor (covariate) column names. Multiple.}
 
-\item{intercept}{Logical. Include intercept term in the model (default TRUE)}
+\item{factors}{Categorical predictor column names. Multiple.}
 
-\item{...}{Forwarded to \code{\link[blockr.core:new_transform_block]{blockr.core::new_transform_block()}}}
+\item{random_effects}{Categorical grouping variable column names for mixed
+models. One random-intercept term \code{(1 | group)} per name. Only used for
+\code{lmer} / \code{glmer}.}
+
+\item{intercept}{Logical. Include intercept term (default TRUE).}
+
+\item{...}{Forwarded to \code{\link[blockr.core:new_transform_block]{blockr.core::new_transform_block()}}.}
 }
 \value{
-A transform block object of class \code{model_block} that outputs
-a model object.
+A transform block object of class \code{model_block}.
 }
 \description{
 Fit statistical models including linear models (lm), generalized linear
-models (glm), and more. This block takes a data frame as input and outputs
-a model object that can be consumed by downstream diagnostic blocks.
+models (glm), multinomial regression, ordinal regression, and mixed-effects
+models. The block emits a fitted model object that downstream blocks
+(parameters, anova, performance, effect sizes, diagnostics, report)
+consume via easystats / broom S3 dispatch.
 }
 \examples{
 if (interactive()) {

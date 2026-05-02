@@ -22,19 +22,29 @@ Imports:
     shiny,
     blockr.core (>= 0.1.1),
     broom,
+    correlation,
     echarts4r,
+    effectsize,
     ggplot2,
     glue,
     htmlwidgets,
+    htmltools,
+    knitr,
+    lme4,
+    MASS,
     modelsummary,
+    nnet,
+    parameters,
     performance,
     plotly,
+    report,
     see,
     stats,
-    shinyjs
+    shinyjs,
+    tibble
 Suggests:
     blockr.extra,
     gtsummary,
-    MASS,
+    palmerpenguins,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3

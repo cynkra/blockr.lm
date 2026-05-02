@@ -223,10 +223,6 @@ new_lm_block <- function(
   )
 }
 
-#' Custom block output for lm_block
-#'
-#' Displays the model summary as text output.
-#'
 #' @export
 block_output.lm_block <- function(x, result, session) {
   renderPrint({
@@ -238,8 +234,6 @@ block_output.lm_block <- function(x, result, session) {
   })
 }
 
-#' Custom block UI for lm_block
-#'
 #' @export
 block_ui.lm_block <- function(id, x, ...) {
   tagList(

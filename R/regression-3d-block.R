@@ -145,15 +145,11 @@ create_regression_3d_plot <- function(model) {
     )
 }
 
-#' Custom block output for regression_3d_block
-#'
 #' @export
 block_output.regression_3d_block <- function(x, result, session) {
   plotly::renderPlotly(result)
 }
 
-#' Custom block UI for regression_3d_block
-#'
 #' @export
 block_ui.regression_3d_block <- function(id, x, ...) {
   tagList(

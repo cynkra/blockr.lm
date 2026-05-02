@@ -218,15 +218,11 @@ create_residual_plot_echarts <- function(model, x_var = "fitted", y_var = "resid
     echarts4r::e_grid(left = "55px", right = "16px", bottom = "50px", top = "20px")
 }
 
-#' Custom block output for residual_explorer_block
-#'
 #' @export
 block_output.residual_explorer_block <- function(x, result, session) {
   echarts4r::renderEcharts4r(result)
 }
 
-#' Custom block UI for residual_explorer_block
-#'
 #' @export
 block_ui.residual_explorer_block <- function(id, x, ...) {
   tagList(
